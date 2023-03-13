@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pybind11
+cppimport
+jupyter
+numpy
+scikit-learn
+scikit-datasets
+Pillow
+torch
