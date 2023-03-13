@@ -8,11 +8,54 @@ import torch
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 
-from network.Transformer import Transformer
+from cartoongan.network.Transformer import Transformer
 
 
-def transform(models, style, input, load_size=450, gpu=-1):
-    model = models[style]
+def transformAll(logger, inputFolder, outputFolder, load_size=450, gpu=-1):
+    styles = ["Hosoda", "Hayao", "Shinkai", "Paprika"]
+    for images in os.listdir(inputFolder):
+        logger.info("transformAll: "+ images)
+        inputPath = os.path.join(inputFolder, images)
+        combinedImgPath = os.path.join(outputFolder, 'combined_'+ images)        
+        combinedImg = inputPath
+        
+        #resize input image        
+        image1 = Image.open(inputPath)
+        image1 = image1.resize((load_size, load_size))
+        image1.save(inputPath)
+
+        for style in styles:
+            logger.info("===> Style: "+ style)
+            outputPath = transform(style, inputPath, outputFolder, load_size, gpu)
+            logger.info("combinedImg: "+combinedImg)
+            logger.info("outputPath: "+outputPath)
+            logger.info("combinedImgPath: "+combinedImgPath)
+            combinedImg = mergeImage(combinedImg, outputPath, combinedImgPath)
+    return 'Done'
+
+
+def mergeImage(img1, img2, newImgName):
+    image1 = Image.open(img1)
+    image2 = Image.open(img2)
+
+    image1_size = image1.size
+    image2_size = image2.size
+        
+    new_image = Image.new('RGB',(image1_size[0]+image2_size[0], image1_size[1]), (250,250,250))
+    new_image.paste(image1,(0,0))
+    new_image.paste(image2,(image1_size[0],0))
+    
+    # new_image.save(newImgName, os.path.splitext(os.path.basename(newImgName))[1].upper())
+    new_image.save(newImgName, "JPEG")
+    return newImgName
+
+def transform(style, input, output, load_size=450, gpu=-1):
+
+    models = {}
+    model = Transformer()
+    model.load_state_dict(torch.load(os.path.join("./cartoongan/pretrained_models/", style + '_net_G_float.pth')))
+    model.eval()
+    models[style] = model
 
     if gpu > -1:
         model.cuda()
@@ -57,4 +100,11 @@ def transform(models, style, input, load_size=450, gpu=-1):
     output_image = np.uint8(output_image.transpose(1, 2, 0) * 255)
     output_image = Image.fromarray(output_image)
 
-    return output_image
+    file_name = os.path.splitext(os.path.basename(input))[0]
+    ext = os.path.splitext(os.path.basename(input))[1]
+
+    output_path = os.path.join(output , file_name + '_' + style + ext)
+    output_image.save(output_path)
+
+    # return output_image
+    return output_path
