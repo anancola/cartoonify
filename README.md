@@ -13,12 +13,12 @@ $ uvicorn main:app --host 0.0.0.0 --port 8000
 Open link: http://localhost:8000/docs
 
 ## Endpoints
-POST /predict  
+1. POST /predict  
 {  
   "style": "Hosoda",  
   "file_path": "./input_images/01.png"  
 }  
-POST /predictAllStyle  
+2. POST /predictAllStyle  
 {  
 "style": "",  
 "file_path": "./input_images/"  
