@@ -2,7 +2,8 @@
 https://github.com/ahmedbesbes/cartoonify
 
 ## Descriptions
-Create APIs to generate cartoonify image and save in the server.
+Create APIs to generate cartoonify image and save in the server.  
+Provide 4 styles: Hosoda, Hayao, Shinkai, Paprika.
 
 ## Quick Start
 ```
@@ -12,8 +13,16 @@ $ uvicorn main:app --host 0.0.0.0 --port 8000
 Open link: http://localhost:8000/docs
 
 ## Endpoints
-/predict  
-/predictAllStyle  
+POST /predict  
+{  
+  "style": "Hosoda",  
+  "file_path": "./input_images/01.png"  
+}  
+POST /predictAllStyle  
+{  
+"style": "",  
+"file_path": "./input_images/"  
+}  
 
 ## Result
 ![image](./output_images/combined_01.png)
